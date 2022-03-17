@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   TextInput,
   ActivityIndicator,
@@ -13,49 +13,48 @@ import {
   View,
 } from 'react-native';
 
-import {getLocation} from '../api/location';
+import { getLocation } from '../api/location';
+import { getWeather } from '../api/weather';
 
-const SearchInput = () => {
+const SearchInput = ({ setLocationData }) => {
   const [input, setInput] = useState('');
-  const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState();
-  const [data, setData] = useState([]);
 
-  const fetchDataHandler = () => {
+  const fetchDataHandler = async () => {
+    if (!input) {
+      return
+    }
     setLoading(true);
-    const data = getLocation(input)
-    setLocations(data)
+    const data = await getLocation(input);
+    if (!data) {
+      setLoading(false);
+      return;
+    }
+    const location = data.find((city) => city.title.toLowerCase() === input.toLowerCase());
+    if (!location) {
+      setLoading(false);
+      return;
+    }
+    const weatherData = await getWeather(location.woeid);
+    setLocationData(weatherData);
     setLoading(false);
   };
 
-  const clickHandler = (id) => {
-    console.log(id)
-  }
-
   return (
     <View styles={styles.inputWrapper}>
-      <TextInput
-        placeholder="Enter city"
-        value={input}
-        onChangeText={value => setInput(value)}
-        onSubmitEditing={fetchDataHandler}
-        style={styles.textInput}
-        placeholderTextColor={'white'}
-      />
-      {locations.length > 0 && (
-        <View>
-          {locations.map(city => (
-            <TouchableOpacity style={styles.location} onPress={() => clickHandler(city.woeid)} key={city.woeid}>
-              <Text>{city.title}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
       {loading && (
         <View>
           <ActivityIndicator size={'large'} color="#000" />
         </View>
       )}
+      <TextInput
+        placeholder="Enter city"
+        value={input}
+        onChangeText={(value) => setInput(value)}
+        onSubmitEditing={fetchDataHandler}
+        style={styles.textInput}
+        placeholderTextColor={'white'}
+      />
     </View>
   );
 };
@@ -74,8 +73,8 @@ const styles = StyleSheet.create({
   },
   location: {
     backgroundColor: 'white',
-    marginHorizontal: 20
-  }
+    marginHorizontal: 20,
+  },
 });
 
 export default SearchInput;
