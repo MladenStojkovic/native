@@ -8,13 +8,9 @@
 
 import React, { useState } from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
   ImageBackground,
   StyleSheet,
   Text,
-  useColorScheme,
   View,
 } from 'react-native';
 
@@ -36,7 +32,7 @@ const App = () => {
     <View style={styles.container}>
       <ImageBackground source={backgroundImg} resizeMode="cover" style={styles.image}>
         {city && (
-          <View>
+          <View style={styles.locationContainer}>
             <Text style={styles.locationInfo}>{city}</Text>
             <Text style={styles.locationInfo}>{description}</Text>
             <Text style={styles.locationInfo}>{temperature}C</Text>
@@ -55,13 +51,17 @@ const styles = StyleSheet.create({
 
   image: {
     flex: 1,
-    justifyContent: 'center',
+    paddingTop: 250
+  },
+
+  locationContainer: {
+    marginBottom: 10
   },
 
   locationInfo: {
     textAlign: 'center',
-    color: '#fff',
-  },
+    color: '#fff'
+  }
 });
 
 export default App;
